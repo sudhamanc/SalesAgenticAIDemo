@@ -17,87 +17,61 @@ A production-ready multi-agent AI system for B2B sales automation, featuring int
 ### System Overview
 
 ```mermaid
-graph TB
-    User[👤 User Interface<br/>WebSocket]
+graph LR
+    User[👤 User<br/>WebSocket] --> SuperAgent[🧠 Super Agent<br/>Gemini 2.0 Flash]
     
-    SuperAgent[🧠 Super Agent<br/>Gemini 2.0 Flash<br/>Orchestrator]
+    SuperAgent --> PolicyAgents[📋 Policy Agents<br/>MCP Protocol]
+    SuperAgent --> OpAgents[🎯 Operational Agents<br/>A2A Protocol]
+    SuperAgent --> ServiceAgents[🌐 Service Agents<br/>REST API]
+    SuperAgent --> WorkflowAgents[⚙️ Workflow Agents<br/>LangGraph]
     
-    %% Policy Agents
-    ProductPolicy[📋 Product Policy Agent<br/>MCP]
-    OrderPolicy[📋 Order Policy Agent<br/>MCP]
-    ServicePolicy[📋 Service Policy Agent<br/>MCP]
-    FulfillmentPolicy[📋 Fulfillment Policy Agent<br/>MCP]
+    PolicyAgents --> P1[Product Policy]
+    PolicyAgents --> P2[Order Policy]
+    PolicyAgents --> P3[Service Policy]
+    PolicyAgents --> P4[Fulfillment Policy]
     
-    %% Operational Agents
-    ProspectAgent[🎯 Prospect Agent<br/>A2A - Auto-triggered]
-    LeadGenAgent[🎯 Lead Generation Agent<br/>A2A - Auto-triggered]
-    OrderAgent[🎯 Order Agent<br/>A2A]
+    OpAgents --> O1[Prospect Agent<br/>Auto-triggered]
+    OpAgents --> O2[Lead Gen Agent<br/>Auto-triggered]
+    OpAgents --> O3[Order Agent]
     
-    %% Service Agents
-    ServiceabilityAgent[🌐 Serviceability Agent<br/>REST API]
-    OfferAgent[🌐 Offer Agent<br/>REST API]
-    PostOrderAgent[🌐 Post Order Comm Agent<br/>REST API]
+    ServiceAgents --> S1[Serviceability]
+    ServiceAgents --> S2[Offer]
+    ServiceAgents --> S3[Post Order Comm]
     
-    %% Workflow Agents
-    AddressAgent[⚙️ Address Validation<br/>LangGraph]
-    FulfillmentAgent[⚙️ Fulfillment Agent<br/>LangGraph]
-    ActivationAgent[⚙️ Service Activation<br/>LangGraph]
-    PostActivationAgent[⚙️ Post Activation<br/>LangGraph]
+    WorkflowAgents --> W1[Address Validation]
+    WorkflowAgents --> W2[Fulfillment]
+    WorkflowAgents --> W3[Service Activation]
+    WorkflowAgents --> W4[Post Activation]
     
-    %% Supporting Systems
-    RAG[(📚 RAG System<br/>ChromaDB)]
-    DB[(💾 SQLite<br/>Database)]
-    Gemini[☁️ Gemini API<br/>2.0 Flash]
+    O3 -.A2A.-> S1
+    S1 -.A2A.-> W2
     
-    %% User to Super Agent
-    User -->|WebSocket| SuperAgent
+    SuperAgent --> RAG[(📚 RAG<br/>ChromaDB)]
+    SuperAgent --> DB[(💾 Database<br/>SQLite)]
+    SuperAgent --> Gemini[☁️ Gemini API]
     
-    %% Super Agent to Policy Agents
-    SuperAgent -->|MCP| ProductPolicy
-    SuperAgent -->|MCP| OrderPolicy
-    SuperAgent -->|MCP| ServicePolicy
-    SuperAgent -->|MCP| FulfillmentPolicy
-    
-    %% Super Agent to Operational Agents
-    SuperAgent -->|A2A| ProspectAgent
-    SuperAgent -->|A2A| LeadGenAgent
-    SuperAgent -->|A2A| OrderAgent
-    
-    %% Super Agent to Service Agents
-    SuperAgent -->|REST| ServiceabilityAgent
-    SuperAgent -->|REST| OfferAgent
-    SuperAgent -->|REST| PostOrderAgent
-    
-    %% Super Agent to Workflow Agents
-    SuperAgent -->|LangGraph| AddressAgent
-    SuperAgent -->|LangGraph| FulfillmentAgent
-    SuperAgent -->|LangGraph| ActivationAgent
-    SuperAgent -->|LangGraph| PostActivationAgent
-    
-    %% Sub-Agent to Sub-Agent Communication
-    OrderAgent -.->|A2A| ServiceabilityAgent
-    ServiceabilityAgent -.->|A2A| FulfillmentAgent
-    
-    %% Supporting Systems
-    SuperAgent -->|Query| RAG
-    SuperAgent -->|Store/Retrieve| DB
-    SuperAgent -->|LLM Calls| Gemini
-    
-    %% Styling
+    classDef super fill:#ef4444,stroke:#dc2626,color:#fff,stroke-width:3px
+    classDef group fill:#374151,stroke:#6b7280,color:#fff
     classDef policy fill:#3b82f6,stroke:#1e40af,color:#fff
     classDef operational fill:#10b981,stroke:#059669,color:#fff
     classDef service fill:#f59e0b,stroke:#d97706,color:#fff
     classDef workflow fill:#8b5cf6,stroke:#6d28d9,color:#fff
-    classDef super fill:#ef4444,stroke:#dc2626,color:#fff
     classDef support fill:#6b7280,stroke:#4b5563,color:#fff
     
     class SuperAgent super
-    class ProductPolicy,OrderPolicy,ServicePolicy,FulfillmentPolicy policy
-    class ProspectAgent,LeadGenAgent,OrderAgent operational
-    class ServiceabilityAgent,OfferAgent,PostOrderAgent service
-    class AddressAgent,FulfillmentAgent,ActivationAgent,PostActivationAgent workflow
+    class PolicyAgents,OpAgents,ServiceAgents,WorkflowAgents group
+    class P1,P2,P3,P4 policy
+    class O1,O2,O3 operational
+    class S1,S2,S3 service
+    class W1,W2,W3,W4 workflow
     class RAG,DB,Gemini support
 ```
+
+**Key Features:**
+- **Super Agent** orchestrates all 15 specialized agents
+- **Auto-triggered**: Prospect & Lead Gen agents activate automatically
+- **Sub-agent communication**: Order → Serviceability → Fulfillment (A2A)
+- **Multiple protocols**: MCP, A2A, REST, LangGraph, WebSocket
 
 ### Agent Types
 
