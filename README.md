@@ -100,9 +100,18 @@ graph LR
 ### Communication Flow
 
 ```
-User → Super Agent → Sub-Agents (via A2A Protocol)
-                   ↓
-              Order Agent → Serviceability Agent → Fulfillment Agent
+User (WebSocket)
+    ↓
+Super Agent (Gemini 2.0 Flash) ← Central Orchestrator
+    ├─→ Policy Agents (MCP)
+    ├─→ Operational Agents (A2A)
+    ├─→ Service Agents (REST)
+    ├─→ Workflow Agents (LangGraph)
+    ├─→ RAG System (ChromaDB)
+    └─→ Database (SQLite)
+
+Sub-Agent to Sub-Agent (A2A):
+    Order Agent → Serviceability Agent → Fulfillment Agent
 ```
 
 ## 📋 Prerequisites
