@@ -8,6 +8,9 @@ from typing import Dict, Any, List
 from dotenv import load_dotenv
 from datetime import datetime
 import structlog
+import logging
+import os
+from logging.handlers import TimedRotatingFileHandler
 
 # Load environment variables from .env file
 load_dotenv()
@@ -23,6 +26,48 @@ from agents.policy_agents import (
 from database.sqlite_db import SQLiteDB
 from shared.protocols import a2a_protocol
 
+# Configure logging
+def configure_logging():
+    """Configure structured logging with file rotation."""
+    log_dir = "logs"
+    os.makedirs(log_dir, exist_ok=True)
+    log_file = os.path.join(log_dir, "agentic_sales.log")
+
+    # Standard logging configuration
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(message)s",
+        handlers=[
+            logging.StreamHandler(),  # Console
+            TimedRotatingFileHandler(
+                log_file,
+                when="H",
+                interval=1,
+                backupCount=48,  # Keep 48 hours of logs
+                encoding="utf-8"
+            )
+        ]
+    )
+
+    # Structlog configuration
+    structlog.configure(
+        processors=[
+            structlog.stdlib.filter_by_level,
+            structlog.stdlib.add_logger_name,
+            structlog.stdlib.add_log_level,
+            structlog.stdlib.PositionalArgumentsFormatter(),
+            structlog.processors.TimeStamper(fmt="iso"),
+            structlog.processors.StackInfoRenderer(),
+            structlog.processors.format_exc_info,
+            structlog.processors.JSONRenderer()
+        ],
+        context_class=dict,
+        logger_factory=structlog.stdlib.LoggerFactory(),
+        wrapper_class=structlog.stdlib.BoundLogger,
+        cache_logger_on_first_use=True,
+    )
+
+configure_logging()
 logger = structlog.get_logger()
 
 
